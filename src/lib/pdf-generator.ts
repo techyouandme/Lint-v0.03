@@ -10,16 +10,18 @@ export function generateAnalysisReport(
   let yPosition = 20;
   const pageHeight = doc.internal.pageSize.height;
   const pageWidth = doc.internal.pageSize.width;
-  const margin = 20;
+  const margin = 15;
   const contentWidth = pageWidth - (margin * 2);
+  const maxTextWidth = contentWidth - 20; // Extra margin for text
 
   // Color palette
   const colors = {
-    primary: [59, 130, 246],      // Blue
-    secondary: [147, 51, 234],    // Purple
-    success: [34, 197, 94],       // Green
-    warning: [245, 158, 11],      // Orange
-    danger: [239, 68, 68],        // Red
+    primary: [59, 130, 246],
+    secondary: [147, 51, 234],
+    success: [34, 197, 94],
+    warning: [245, 158, 11],
+    danger: [239, 68, 68],
+    white: [255, 255, 255],
     gray: {
       50: [249, 250, 251],
       100: [243, 244, 246],
@@ -37,10 +39,10 @@ export function generateAnalysisReport(
   // Set default font
   doc.setFont('helvetica', 'normal');
 
-  // Helper function to safely encode text
-  const safeText = (text: string): string => {
+  // Helper function to safely encode text and ensure it fits
+  const safeText = (text: string, maxLength?: number): string => {
     if (!text) return '';
-    return text
+    let cleanText = text
       .toString()
       .replace(/[^\x20-\x7E]/g, '')
       .replace(/[""]/g, '"')
@@ -48,309 +50,359 @@ export function generateAnalysisReport(
       .replace(/[–—]/g, '-')
       .replace(/…/g, '...')
       .trim();
+    
+    if (maxLength && cleanText.length > maxLength) {
+      cleanText = cleanText.substring(0, maxLength - 3) + '...';
+    }
+    
+    return cleanText;
+  };
+
+  // Helper function to split text to fit within bounds
+  const fitText = (text: string, maxWidth: number, fontSize: number = 10): string[] => {
+    doc.setFontSize(fontSize);
+    const lines = doc.splitTextToSize(safeText(text), maxWidth);
+    return lines.map((line: string) => safeText(line));
   };
 
   // Helper function to add new page if needed
   const checkPageBreak = (height: number) => {
-    if (yPosition + height > pageHeight - 40) {
+    if (yPosition + height > pageHeight - 30) {
       doc.addPage();
-      yPosition = 30;
+      yPosition = 25;
       addPageHeader();
     }
   };
 
   // Add page header for subsequent pages
   const addPageHeader = () => {
+    // Header background
     doc.setFillColor(...colors.gray[50]);
-    doc.rect(0, 0, pageWidth, 25, 'F');
+    doc.rect(0, 0, pageWidth, 20, 'F');
     
-    doc.setFontSize(10);
+    // Project name (truncated if needed)
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.gray[700]);
-    doc.text(safeText(projectName), margin, 15);
+    doc.text(safeText(projectName, 40), margin, 12);
     
+    // Report type
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.gray[500]);
-    doc.text('Technical Debt Analysis Report', pageWidth - margin, 15, { align: 'right' });
+    doc.text('Technical Debt Analysis', pageWidth - margin, 12, { align: 'right' });
     
-    // Header line
+    // Separator line
     doc.setDrawColor(...colors.primary);
     doc.setLineWidth(0.5);
-    doc.line(margin, 20, pageWidth - margin, 20);
+    doc.line(margin, 16, pageWidth - margin, 16);
     
-    yPosition = 35;
-  };
-
-  // Professional cover page
-  const addCoverPage = () => {
-    // Background gradient effect
-    doc.setFillColor(...colors.primary);
-    doc.rect(0, 0, pageWidth, 80, 'F');
-    
-    // Overlay gradient
-    for (let i = 0; i < 20; i++) {
-      const alpha = 1 - (i / 20);
-      doc.setFillColor(colors.secondary[0], colors.secondary[1], colors.secondary[2], alpha * 0.3);
-      doc.rect(0, 60 + i * 2, pageWidth, 2, 'F');
-    }
-
-    // Logo area
-    doc.setFillColor(255, 255, 255);
-    doc.circle(margin + 20, 40, 15, 'F');
-    doc.setFillColor(...colors.primary);
-    doc.circle(margin + 20, 40, 12, 'F');
-    doc.setFillColor(255, 255, 255);
-    doc.setFontSize(16);
-    doc.setFont('helvetica', 'bold');
-    doc.text('L', margin + 16, 45);
-
-    // Main title
-    doc.setFontSize(32);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(255, 255, 255);
-    doc.text('Technical Debt', margin + 50, 35);
-    doc.text('Analysis Report', margin + 50, 50);
-
-    // Project name
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(255, 255, 255, 0.9);
-    doc.text(safeText(projectName), margin + 50, 65);
-
-    // Report metadata card
-    const cardY = 100;
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(margin, cardY, contentWidth, 60, 8, 8, 'F');
-    doc.setDrawColor(...colors.gray[200]);
-    doc.setLineWidth(1);
-    doc.roundedRect(margin, cardY, contentWidth, 60, 8, 8, 'D');
-
-    // Metadata content
-    doc.setFontSize(14);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...colors.gray[800]);
-    doc.text('Report Summary', margin + 15, cardY + 20);
-
-    doc.setFontSize(10);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.gray[600]);
-    
-    const metadata = [
-      ['Generated:', new Date().toLocaleDateString('en-US', { 
-        year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-      })],
-      ['For:', safeText(userEmail)],
-      ['Analysis Engine:', 'Gemini 2.0 Flash AI'],
-      ['Overall Debt Score:', `${analysis.overall_debt_score}/100`]
-    ];
-
-    metadata.forEach(([label, value], index) => {
-      const x = margin + 15 + (index % 2) * (contentWidth / 2);
-      const y = cardY + 35 + Math.floor(index / 2) * 12;
-      
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...colors.gray[700]);
-      doc.text(label, x, y);
-      
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(...colors.gray[600]);
-      doc.text(safeText(value), x + 50, y);
-    });
-
-    // Score visualization
-    const scoreX = pageWidth - margin - 80;
-    const scoreY = cardY + 15;
-    const scoreRadius = 25;
-    
-    // Score circle background
-    doc.setFillColor(...colors.gray[100]);
-    doc.circle(scoreX, scoreY, scoreRadius, 'F');
-    
-    // Score circle
-    const scoreColor = analysis.overall_debt_score > 70 ? colors.danger :
-                      analysis.overall_debt_score > 40 ? colors.warning : colors.success;
-    doc.setFillColor(...scoreColor);
-    doc.circle(scoreX, scoreY, scoreRadius - 3, 'F');
-    
-    // Score text
-    doc.setFontSize(20);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(255, 255, 255);
-    doc.text(analysis.overall_debt_score.toString(), scoreX, scoreY + 5, { align: 'center' });
-    
-    doc.setFontSize(8);
-    doc.setTextColor(255, 255, 255, 0.8);
-    doc.text('/100', scoreX, scoreY + 15, { align: 'center' });
-
-    // Footer
-    doc.setFontSize(8);
-    doc.setTextColor(...colors.gray[500]);
-    doc.text('Powered by Lint - Professional Code Analysis Platform', 
-             pageWidth / 2, pageHeight - 20, { align: 'center' });
-
-    doc.addPage();
     yPosition = 30;
   };
 
-  // Section header with modern styling
-  const addSectionHeader = (title: string, subtitle?: string, color: number[] = colors.primary) => {
-    checkPageBreak(40);
+  // Professional cover page with responsive layout
+  const addCoverPage = () => {
+    // Header gradient
+    doc.setFillColor(...colors.primary);
+    doc.rect(0, 0, pageWidth, 70, 'F');
     
-    // Section header background
-    doc.setFillColor(...colors.gray[50]);
-    doc.rect(margin - 5, yPosition - 5, contentWidth + 10, 30, 'F');
+    // Secondary gradient overlay
+    for (let i = 0; i < 15; i++) {
+      const alpha = 0.3 - (i * 0.02);
+      doc.setFillColor(colors.secondary[0], colors.secondary[1], colors.secondary[2], alpha);
+      doc.rect(0, 55 + i, pageWidth, 1, 'F');
+    }
+
+    // Logo circle
+    doc.setFillColor(...colors.white);
+    doc.circle(margin + 15, 35, 12, 'F');
+    doc.setFillColor(...colors.primary);
+    doc.circle(margin + 15, 35, 9, 'F');
     
-    // Left accent bar
-    doc.setFillColor(...color);
-    doc.rect(margin - 5, yPosition - 5, 4, 30, 'F');
+    // Logo text
+    doc.setFillColor(...colors.white);
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'bold');
+    doc.text('L', margin + 12, 38);
+
+    // Main title
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.white);
+    doc.text('Technical Debt Analysis', margin + 35, 30);
     
-    // Title
+    doc.setFontSize(20);
+    doc.text('Report', margin + 35, 45);
+
+    // Project name (responsive)
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(255, 255, 255, 0.9);
+    const truncatedProjectName = safeText(projectName, 35);
+    doc.text(truncatedProjectName, margin + 35, 58);
+
+    // Main info card with proper spacing
+    const cardY = 85;
+    const cardHeight = 80;
+    
+    // Card background
+    doc.setFillColor(...colors.white);
+    doc.roundedRect(margin, cardY, contentWidth, cardHeight, 6, 6, 'F');
+    doc.setDrawColor(...colors.gray[200]);
+    doc.setLineWidth(1);
+    doc.roundedRect(margin, cardY, contentWidth, cardHeight, 6, 6, 'D');
+
+    // Card title
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.gray[800]);
+    doc.text('Report Overview', margin + 12, cardY + 18);
+
+    // Score circle (positioned properly)
+    const scoreX = pageWidth - margin - 35;
+    const scoreY = cardY + 35;
+    const scoreRadius = 22;
+    
+    // Score background
+    doc.setFillColor(...colors.gray[100]);
+    doc.circle(scoreX, scoreY, scoreRadius, 'F');
+    
+    // Score color based on value
+    const scoreColor = analysis.overall_debt_score > 70 ? colors.danger :
+                      analysis.overall_debt_score > 40 ? colors.warning : colors.success;
+    
+    doc.setFillColor(...scoreColor);
+    doc.circle(scoreX, scoreY, scoreRadius - 2, 'F');
+    
+    // Score text
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.white);
+    doc.text(analysis.overall_debt_score.toString(), scoreX, scoreY + 4, { align: 'center' });
+    
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255, 0.8);
+    doc.text('/100', scoreX, scoreY + 14, { align: 'center' });
+
+    // Metadata in two columns
+    const leftColX = margin + 12;
+    const rightColX = margin + 12 + (contentWidth / 2);
+    let metaY = cardY + 35;
+
+    // Left column
+    doc.setFontSize(9);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.gray[700]);
+    doc.text('Generated:', leftColX, metaY);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.gray[600]);
+    const dateText = new Date().toLocaleDateString('en-US', { 
+      month: 'short', day: 'numeric', year: 'numeric'
+    });
+    doc.text(dateText, leftColX, metaY + 10);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.gray[700]);
+    doc.text('Analysis Engine:', leftColX, metaY + 25);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.gray[600]);
+    doc.text('Gemini 2.0 Flash AI', leftColX, metaY + 35);
+
+    // Right column
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.gray[700]);
+    doc.text('Generated For:', rightColX, metaY);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.gray[600]);
+    const emailText = safeText(userEmail, 25);
+    doc.text(emailText, rightColX, metaY + 10);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.gray[700]);
+    doc.text('Files Analyzed:', rightColX, metaY + 25);
+    
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.gray[600]);
+    doc.text(`${analysis.file_analyses?.length || 0} files`, rightColX, metaY + 35);
+
+    // Quality indicator
+    const qualityY = cardY + 75;
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.gray[500]);
+    const qualityText = analysis.overall_debt_score > 70 ? 'High Technical Debt' :
+                       analysis.overall_debt_score > 40 ? 'Moderate Technical Debt' : 'Low Technical Debt';
+    doc.text(`Assessment: ${qualityText}`, margin + 12, qualityY);
+
+    // Footer
+    doc.setFontSize(8);
+    doc.setTextColor(...colors.gray[400]);
+    doc.text('Powered by Lint - Professional Code Analysis Platform', 
+             pageWidth / 2, pageHeight - 15, { align: 'center' });
+
+    doc.addPage();
+    yPosition = 25;
+  };
+
+  // Section header with proper spacing
+  const addSectionHeader = (title: string, subtitle?: string, color: number[] = colors.primary) => {
+    checkPageBreak(35);
+    
+    // Section background
+    doc.setFillColor(...colors.gray[50]);
+    doc.rect(margin - 2, yPosition - 2, contentWidth + 4, 25, 'F');
+    
+    // Left accent
+    doc.setFillColor(...color);
+    doc.rect(margin - 2, yPosition - 2, 3, 25, 'F');
+    
+    // Title
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
     doc.setTextColor(...color);
-    doc.text(safeText(title), margin + 10, yPosition + 8);
+    doc.text(safeText(title, 50), margin + 8, yPosition + 8);
     
     // Subtitle
     if (subtitle) {
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...colors.gray[600]);
-      doc.text(safeText(subtitle), margin + 10, yPosition + 18);
+      const subtitleLines = fitText(subtitle, maxTextWidth - 20, 9);
+      doc.text(safeText(subtitleLines[0], 60), margin + 8, yPosition + 18);
     }
     
-    yPosition += 40;
+    yPosition += 30;
   };
 
-  // Executive summary with better styling
+  // Executive summary with text fitting
   const addExecutiveSummary = () => {
     if (!analysis.summary) return;
     
     addSectionHeader('Executive Summary', 'Key findings and overall assessment');
     
-    const summaryText = safeText(analysis.summary);
-    const lines = doc.splitTextToSize(summaryText, contentWidth - 30);
-    const summaryHeight = lines.length * 6 + 20;
+    const summaryLines = fitText(analysis.summary, maxTextWidth, 10);
+    const summaryHeight = summaryLines.length * 5 + 15;
     
     checkPageBreak(summaryHeight);
     
     // Summary card
-    doc.setFillColor(255, 255, 255);
-    doc.roundedRect(margin, yPosition, contentWidth, summaryHeight, 6, 6, 'F');
+    doc.setFillColor(...colors.white);
+    doc.roundedRect(margin, yPosition, contentWidth, summaryHeight, 4, 4, 'F');
     doc.setDrawColor(...colors.gray[200]);
     doc.setLineWidth(0.5);
-    doc.roundedRect(margin, yPosition, contentWidth, summaryHeight, 6, 6, 'D');
+    doc.roundedRect(margin, yPosition, contentWidth, summaryHeight, 4, 4, 'D');
     
     // Content
-    doc.setFontSize(11);
+    doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.gray[700]);
     
-    lines.forEach((line: string, index: number) => {
-      doc.text(safeText(line), margin + 15, yPosition + 15 + (index * 6));
+    summaryLines.forEach((line: string, index: number) => {
+      if (index < 8) { // Limit lines to prevent overflow
+        doc.text(safeText(line), margin + 10, yPosition + 12 + (index * 5));
+      }
     });
     
-    yPosition += summaryHeight + 20;
+    yPosition += summaryHeight + 15;
   };
 
-  // Enhanced file analysis
+  // File analysis with proper text fitting
   const addFileAnalysis = () => {
     if (!analysis.file_analyses || analysis.file_analyses.length === 0) return;
     
-    addSectionHeader('Detailed File Analysis', 
-      `Analysis of ${Math.min(analysis.file_analyses.length, 8)} files with highest impact`);
+    const fileCount = Math.min(analysis.file_analyses.length, 6);
+    addSectionHeader('File Analysis', `Detailed analysis of ${fileCount} key files`);
     
-    analysis.file_analyses.slice(0, 8).forEach((fileAnalysis, index) => {
-      const estimatedHeight = 45 + Math.min(fileAnalysis.issues?.length || 0, 3) * 15;
+    analysis.file_analyses.slice(0, 6).forEach((fileAnalysis) => {
+      const estimatedHeight = 40 + Math.min(fileAnalysis.issues?.length || 0, 2) * 12;
       checkPageBreak(estimatedHeight);
       
-      // File header
-      doc.setFillColor(255, 255, 255);
-      doc.roundedRect(margin, yPosition, contentWidth, 35, 6, 6, 'F');
+      // File card
+      doc.setFillColor(...colors.white);
+      doc.roundedRect(margin, yPosition, contentWidth, 30, 4, 4, 'F');
       doc.setDrawColor(...colors.gray[200]);
       doc.setLineWidth(0.5);
-      doc.roundedRect(margin, yPosition, contentWidth, 35, 6, 6, 'D');
+      doc.roundedRect(margin, yPosition, contentWidth, 30, 4, 4, 'D');
       
       // File icon
       doc.setFillColor(...colors.primary);
-      doc.roundedRect(margin + 10, yPosition + 8, 20, 20, 4, 4, 'F');
-      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(margin + 8, yPosition + 8, 15, 15, 2, 2, 'F');
+      doc.setFillColor(...colors.white);
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.text('{ }', margin + 15.5, yPosition + 17, { align: 'center' });
+      
+      // File name (truncated)
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
-      doc.text('{ }', margin + 20, yPosition + 20, { align: 'center' });
-      
-      // File name
-      doc.setFontSize(12);
-      doc.setFont('helvetica', 'bold');
       doc.setTextColor(...colors.gray[800]);
-      const fileName = fileAnalysis.file_path.length > 50 ? 
-        '...' + fileAnalysis.file_path.slice(-47) : fileAnalysis.file_path;
-      doc.text(safeText(fileName), margin + 40, yPosition + 15);
+      const fileName = safeText(fileAnalysis.file_path, 45);
+      doc.text(fileName, margin + 28, yPosition + 15);
       
       // Score badge
       const scoreColor = fileAnalysis.debt_score > 70 ? colors.danger :
                         fileAnalysis.debt_score > 40 ? colors.warning : colors.success;
       
       doc.setFillColor(...scoreColor);
-      doc.roundedRect(pageWidth - margin - 60, yPosition + 8, 50, 20, 10, 10, 'F');
+      doc.roundedRect(pageWidth - margin - 45, yPosition + 8, 35, 15, 7, 7, 'F');
       
-      doc.setFontSize(10);
+      doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(255, 255, 255);
-      doc.text(`${fileAnalysis.debt_score}/100`, pageWidth - margin - 35, yPosition + 20, { align: 'center' });
+      doc.setTextColor(...colors.white);
+      doc.text(`${fileAnalysis.debt_score}/100`, pageWidth - margin - 27.5, yPosition + 17, { align: 'center' });
       
-      yPosition += 40;
+      yPosition += 35;
       
-      // Issues (compact format)
+      // Top 2 issues only
       if (fileAnalysis.issues && fileAnalysis.issues.length > 0) {
-        const issues = fileAnalysis.issues.slice(0, 3);
+        const issues = fileAnalysis.issues.slice(0, 2);
         
         issues.forEach((issue: any) => {
-          checkPageBreak(15);
+          checkPageBreak(12);
           
           const severityColor = issue.severity === 'high' ? colors.danger :
                                issue.severity === 'medium' ? colors.warning : colors.success;
           
-          // Issue line
+          // Issue background
           doc.setFillColor(...colors.gray[50]);
-          doc.rect(margin + 10, yPosition, contentWidth - 20, 12, 'F');
+          doc.rect(margin + 5, yPosition, contentWidth - 10, 10, 'F');
           
-          // Severity dot
+          // Severity indicator
           doc.setFillColor(...severityColor);
-          doc.circle(margin + 18, yPosition + 6, 2, 'F');
+          doc.circle(margin + 12, yPosition + 5, 1.5, 'F');
           
-          // Issue text
-          doc.setFontSize(9);
+          // Issue text (truncated)
+          doc.setFontSize(8);
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(...severityColor);
-          doc.text(safeText(issue.type || 'Issue'), margin + 25, yPosition + 7);
+          doc.text(safeText(issue.type || 'Issue', 15), margin + 18, yPosition + 6);
           
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(...colors.gray[600]);
-          const description = safeText(issue.description || '').substring(0, 80) + '...';
-          doc.text(description, margin + 80, yPosition + 7);
+          const description = safeText(issue.description || '', 50);
+          doc.text(description, margin + 55, yPosition + 6);
           
-          yPosition += 15;
+          yPosition += 12;
         });
-        
-        yPosition += 5;
       }
       
-      yPosition += 10;
+      yPosition += 8;
     });
   };
 
-  // Enhanced recommendations
+  // Recommendations with proper formatting
   const addRecommendations = () => {
     if (!analysis.recommendations || analysis.recommendations.length === 0) return;
     
-    addSectionHeader('Priority Recommendations', 
-      'Actionable steps to improve code quality and reduce technical debt');
+    addSectionHeader('Key Recommendations', 'Priority actions to improve code quality');
     
-    // Group by priority
+    // Group and limit recommendations
     const grouped = {
-      high: analysis.recommendations.filter(r => r.priority === 'high'),
-      medium: analysis.recommendations.filter(r => r.priority === 'medium'),
-      low: analysis.recommendations.filter(r => r.priority === 'low')
+      high: analysis.recommendations.filter(r => r.priority === 'high').slice(0, 3),
+      medium: analysis.recommendations.filter(r => r.priority === 'medium').slice(0, 2),
+      low: analysis.recommendations.filter(r => r.priority === 'low').slice(0, 2)
     };
     
     ['high', 'medium', 'low'].forEach(priority => {
@@ -360,49 +412,48 @@ export function generateAnalysisReport(
       const priorityColor = priority === 'high' ? colors.danger :
                            priority === 'medium' ? colors.warning : colors.success;
       
-      // Priority section header
-      checkPageBreak(25);
+      // Priority header
+      checkPageBreak(20);
       doc.setFillColor(...priorityColor, 0.1);
-      doc.rect(margin, yPosition, contentWidth, 20, 'F');
+      doc.rect(margin, yPosition, contentWidth, 15, 'F');
       
-      doc.setFontSize(12);
+      doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...priorityColor);
-      doc.text(`${priority.toUpperCase()} PRIORITY (${recs.length})`, margin + 10, yPosition + 12);
+      doc.text(`${priority.toUpperCase()} PRIORITY (${recs.length})`, margin + 8, yPosition + 10);
       
-      yPosition += 25;
+      yPosition += 20;
       
-      recs.forEach((rec: any, index: number) => {
-        checkPageBreak(35);
+      recs.forEach((rec: any) => {
+        checkPageBreak(25);
         
         // Recommendation card
-        doc.setFillColor(255, 255, 255);
-        doc.roundedRect(margin, yPosition, contentWidth, 30, 4, 4, 'F');
+        doc.setFillColor(...colors.white);
+        doc.roundedRect(margin, yPosition, contentWidth, 22, 3, 3, 'F');
         doc.setDrawColor(...priorityColor, 0.3);
-        doc.setLineWidth(1);
-        doc.roundedRect(margin, yPosition, contentWidth, 30, 4, 4, 'D');
+        doc.setLineWidth(0.5);
+        doc.roundedRect(margin, yPosition, contentWidth, 22, 3, 3, 'D');
         
-        // Priority indicator
+        // Priority bar
         doc.setFillColor(...priorityColor);
-        doc.rect(margin, yPosition, 4, 30, 'F');
+        doc.rect(margin, yPosition, 3, 22, 'F');
         
         // Content
-        doc.setFontSize(11);
+        doc.setFontSize(10);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...colors.gray[800]);
-        doc.text(safeText(rec.category || 'General'), margin + 15, yPosition + 12);
+        doc.text(safeText(rec.category || 'General', 25), margin + 10, yPosition + 10);
         
-        doc.setFontSize(9);
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...colors.gray[600]);
-        const description = safeText(rec.description || '');
-        const descLines = doc.splitTextToSize(description, contentWidth - 30);
-        doc.text(safeText(descLines[0] || ''), margin + 15, yPosition + 22);
+        const description = safeText(rec.description || '', 80);
+        doc.text(description, margin + 10, yPosition + 18);
         
-        yPosition += 35;
+        yPosition += 27;
       });
       
-      yPosition += 10;
+      yPosition += 5;
     });
   };
 
@@ -417,26 +468,24 @@ export function generateAnalysisReport(
       // Footer line
       doc.setDrawColor(...colors.gray[200]);
       doc.setLineWidth(0.5);
-      doc.line(margin, pageHeight - 25, pageWidth - margin, pageHeight - 25);
+      doc.line(margin, pageHeight - 20, pageWidth - margin, pageHeight - 20);
       
       // Footer content
-      doc.setFontSize(8);
+      doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...colors.gray[500]);
-      doc.text('Generated by Lint | Professional Code Analysis Platform', 
-               margin, pageHeight - 15);
+      doc.text('Generated by Lint | Professional Code Analysis', margin, pageHeight - 12);
       
-      doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, pageHeight - 15, { align: 'right' });
+      doc.text(`Page ${i} of ${pageCount}`, pageWidth - margin, pageHeight - 12, { align: 'right' });
       
       // Confidential notice
-      doc.setFontSize(7);
+      doc.setFontSize(6);
       doc.setTextColor(...colors.gray[400]);
-      doc.text('Confidential - For internal use only', 
-               pageWidth / 2, pageHeight - 8, { align: 'center' });
+      doc.text('Confidential - Internal Use Only', pageWidth / 2, pageHeight - 6, { align: 'center' });
     }
   };
 
-  // Generate the report
+  // Generate the complete report
   addCoverPage();
   addExecutiveSummary();
   addFileAnalysis();
