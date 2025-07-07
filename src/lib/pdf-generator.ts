@@ -12,7 +12,7 @@ export function generateAnalysisReport(
   const pageWidth = doc.internal.pageSize.width;
   const margin = 15;
   const contentWidth = pageWidth - (margin * 2);
-  const maxTextWidth = contentWidth - 20; // Extra margin for text
+  const maxTextWidth = contentWidth - 20;
 
   // Color palette
   const colors = {
@@ -99,68 +99,89 @@ export function generateAnalysisReport(
     yPosition = 30;
   };
 
-  // Professional cover page with responsive layout
+  // Professional cover page with enhanced design
   const addCoverPage = () => {
-    // Header gradient
+    // Modern gradient header
     doc.setFillColor(...colors.primary);
-    doc.rect(0, 0, pageWidth, 70, 'F');
+    doc.rect(0, 0, pageWidth, 80, 'F');
     
-    // Secondary gradient overlay
-    for (let i = 0; i < 15; i++) {
-      const alpha = 0.3 - (i * 0.02);
+    // Gradient overlay effect
+    for (let i = 0; i < 20; i++) {
+      const alpha = 0.4 - (i * 0.02);
       doc.setFillColor(colors.secondary[0], colors.secondary[1], colors.secondary[2], alpha);
-      doc.rect(0, 55 + i, pageWidth, 1, 'F');
+      doc.rect(0, 60 + i, pageWidth, 1, 'F');
     }
 
-    // Logo circle
+    // Enhanced logo design
+    const logoX = margin + 20;
+    const logoY = 35;
+    
+    // Logo outer circle
     doc.setFillColor(...colors.white);
-    doc.circle(margin + 15, 35, 12, 'F');
+    doc.circle(logoX, logoY, 16, 'F');
+    
+    // Logo inner circle
     doc.setFillColor(...colors.primary);
-    doc.circle(margin + 15, 35, 9, 'F');
+    doc.circle(logoX, logoY, 12, 'F');
+    
+    // Logo accent
+    doc.setFillColor(...colors.secondary);
+    doc.circle(logoX, logoY, 8, 'F');
     
     // Logo text
     doc.setFillColor(...colors.white);
-    doc.setFontSize(12);
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
-    doc.text('L', margin + 12, 38);
+    doc.text('L', logoX - 4, logoY + 4);
 
-    // Main title
-    doc.setFontSize(24);
+    // Main title - split into two lines for better layout
+    doc.setFontSize(28);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.white);
-    doc.text('Technical Debt Analysis', margin + 35, 30);
+    doc.text('Technical Debt Analysis', logoX + 25, 28);
     
-    doc.setFontSize(20);
-    doc.text('Report', margin + 35, 45);
+    doc.setFontSize(24);
+    doc.text('Report', logoX + 25, 48);
 
-    // Project name (responsive)
-    doc.setFontSize(14);
+    // Project name with proper truncation
+    doc.setFontSize(12);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(255, 255, 255, 0.9);
-    const truncatedProjectName = safeText(projectName, 35);
-    doc.text(truncatedProjectName, margin + 35, 58);
+    const truncatedProjectName = safeText(projectName, 45);
+    doc.text(`Project: ${truncatedProjectName}`, logoX + 25, 65);
 
-    // Main info card with proper spacing
-    const cardY = 85;
-    const cardHeight = 80;
+    // Professional info card with optimized layout
+    const cardY = 95;
+    const cardHeight = 85;
+    
+    // Card shadow effect
+    doc.setFillColor(0, 0, 0, 0.1);
+    doc.roundedRect(margin + 2, cardY + 2, contentWidth, cardHeight, 8, 8, 'F');
     
     // Card background
     doc.setFillColor(...colors.white);
-    doc.roundedRect(margin, cardY, contentWidth, cardHeight, 6, 6, 'F');
+    doc.roundedRect(margin, cardY, contentWidth, cardHeight, 8, 8, 'F');
     doc.setDrawColor(...colors.gray[200]);
     doc.setLineWidth(1);
-    doc.roundedRect(margin, cardY, contentWidth, cardHeight, 6, 6, 'D');
+    doc.roundedRect(margin, cardY, contentWidth, cardHeight, 8, 8, 'D');
 
-    // Card title
-    doc.setFontSize(16);
+    // Card title with accent
+    doc.setFillColor(...colors.primary, 0.1);
+    doc.rect(margin, cardY, contentWidth, 20, 'F');
+    
+    doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.gray[800]);
-    doc.text('Report Overview', margin + 12, cardY + 18);
+    doc.text('Report Overview', margin + 15, cardY + 13);
 
-    // Score circle (positioned properly)
-    const scoreX = pageWidth - margin - 35;
-    const scoreY = cardY + 35;
-    const scoreRadius = 22;
+    // Score circle - properly positioned on the right
+    const scoreX = pageWidth - margin - 40;
+    const scoreY = cardY + 50;
+    const scoreRadius = 25;
+    
+    // Score shadow
+    doc.setFillColor(0, 0, 0, 0.1);
+    doc.circle(scoreX + 1, scoreY + 1, scoreRadius, 'F');
     
     // Score background
     doc.setFillColor(...colors.gray[100]);
@@ -171,76 +192,90 @@ export function generateAnalysisReport(
                       analysis.overall_debt_score > 40 ? colors.warning : colors.success;
     
     doc.setFillColor(...scoreColor);
-    doc.circle(scoreX, scoreY, scoreRadius - 2, 'F');
+    doc.circle(scoreX, scoreY, scoreRadius - 3, 'F');
     
     // Score text
-    doc.setFontSize(18);
+    doc.setFontSize(20);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.white);
-    doc.text(analysis.overall_debt_score.toString(), scoreX, scoreY + 4, { align: 'center' });
+    doc.text(analysis.overall_debt_score.toString(), scoreX, scoreY + 2, { align: 'center' });
     
-    doc.setFontSize(8);
+    doc.setFontSize(10);
     doc.setTextColor(255, 255, 255, 0.8);
-    doc.text('/100', scoreX, scoreY + 14, { align: 'center' });
+    doc.text('/100', scoreX, scoreY + 15, { align: 'center' });
 
-    // Metadata in two columns
-    const leftColX = margin + 12;
-    const rightColX = margin + 12 + (contentWidth / 2);
+    // Metadata in compact two-column layout
+    const leftColX = margin + 15;
+    const rightColX = margin + 15 + (contentWidth / 2.5);
     let metaY = cardY + 35;
 
-    // Left column
+    // Left column - compact format
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.gray[700]);
-    doc.text('Generated:', leftColX, metaY);
     
+    // Generated date
+    doc.text('Generated:', leftColX, metaY);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.gray[600]);
     const dateText = new Date().toLocaleDateString('en-US', { 
       month: 'short', day: 'numeric', year: 'numeric'
     });
-    doc.text(dateText, leftColX, metaY + 10);
+    doc.text(dateText, leftColX + 35, metaY);
 
+    // Analysis engine
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.gray[700]);
-    doc.text('Analysis Engine:', leftColX, metaY + 25);
-    
+    doc.text('Engine:', leftColX, metaY + 12);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.gray[600]);
-    doc.text('Gemini 2.0 Flash AI', leftColX, metaY + 35);
+    doc.text('Gemini 2.0 Flash AI', leftColX + 25, metaY + 12);
 
-    // Right column
+    // Right column - compact format
+    // Generated for
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.gray[700]);
     doc.text('Generated For:', rightColX, metaY);
-    
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.gray[600]);
-    const emailText = safeText(userEmail, 25);
-    doc.text(emailText, rightColX, metaY + 10);
+    const emailText = safeText(userEmail, 30);
+    doc.text(emailText, rightColX + 40, metaY);
 
+    // Files analyzed
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...colors.gray[700]);
-    doc.text('Files Analyzed:', rightColX, metaY + 25);
-    
+    doc.text('Files Analyzed:', rightColX, metaY + 12);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(...colors.gray[600]);
-    doc.text(`${analysis.file_analyses?.length || 0} files`, rightColX, metaY + 35);
+    doc.text(`${analysis.file_analyses?.length || 0} files`, rightColX + 40, metaY + 12);
 
-    // Quality indicator
-    const qualityY = cardY + 75;
+    // Assessment indicator - positioned below score
+    const assessmentY = cardY + 75;
     doc.setFontSize(8);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.gray[500]);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...scoreColor);
     const qualityText = analysis.overall_debt_score > 70 ? 'High Technical Debt' :
                        analysis.overall_debt_score > 40 ? 'Moderate Technical Debt' : 'Low Technical Debt';
-    doc.text(`Assessment: ${qualityText}`, margin + 12, qualityY);
+    doc.text(`Assessment: ${qualityText}`, scoreX, assessmentY, { align: 'center' });
 
-    // Footer
+    // Professional footer with branding
+    const footerY = pageHeight - 25;
+    doc.setFillColor(...colors.gray[50]);
+    doc.rect(0, footerY - 5, pageWidth, 30, 'F');
+    
+    doc.setDrawColor(...colors.primary);
+    doc.setLineWidth(1);
+    doc.line(0, footerY - 5, pageWidth, footerY - 5);
+    
     doc.setFontSize(8);
-    doc.setTextColor(...colors.gray[400]);
-    doc.text('Powered by Lint - Professional Code Analysis Platform', 
-             pageWidth / 2, pageHeight - 15, { align: 'center' });
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.primary);
+    doc.text('Powered by Lint', pageWidth / 2, footerY + 5, { align: 'center' });
+    
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(...colors.gray[500]);
+    doc.text('Professional Code Analysis Platform', pageWidth / 2, footerY + 12, { align: 'center' });
 
     doc.addPage();
     yPosition = 25;
