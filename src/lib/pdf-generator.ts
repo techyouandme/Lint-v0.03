@@ -13,6 +13,22 @@ export function generateAnalysisReport(
   const margin = 20;
   const contentWidth = pageWidth - (margin * 2);
 
+  // Set default font to ensure proper encoding
+  doc.setFont('helvetica', 'normal');
+
+  // Helper function to safely encode text
+  const safeText = (text: string): string => {
+    if (!text) return '';
+    // Replace problematic characters and ensure proper encoding
+    return text
+      .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
+      .replace(/[""]/g, '"') // Replace smart quotes
+      .replace(/['']/g, "'") // Replace smart apostrophes
+      .replace(/[–—]/g, '-') // Replace em/en dashes
+      .replace(/…/g, '...') // Replace ellipsis
+      .trim();
+  };
+
   // Helper function to add new page if needed
   const checkPageBreak = (height: number) => {
     if (yPosition + height > pageHeight - margin - 20) {
@@ -25,6 +41,7 @@ export function generateAnalysisReport(
   // Add watermark to each page
   const addWatermark = () => {
     doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
     doc.setTextColor(200, 200, 200);
     doc.text('TechDebt Analyzer - Professional Code Analysis', pageWidth / 2, pageHeight - 10, { align: 'center' });
   };
@@ -39,20 +56,22 @@ export function generateAnalysisReport(
     doc.setFillColor(147, 51, 234); // Purple
     doc.rect(pageWidth * 0.7, 0, pageWidth * 0.3, 40, 'F');
     
-    // Logo placeholder (using text)
-    doc.setFontSize(20);
-    doc.setTextColor(255, 255, 255);
-    doc.text('🔍', margin, 25);
+    // Logo placeholder (using simple geometric shape)
+    doc.setFillColor(255, 255, 255);
+    doc.circle(margin + 10, 25, 8, 'F');
+    doc.setFillColor(59, 130, 246);
+    doc.circle(margin + 10, 25, 6, 'F');
     
     // Title
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('TechDebt Analyzer', margin + 15, 25);
+    doc.setTextColor(255, 255, 255);
+    doc.text('TechDebt Analyzer', margin + 25, 25);
     
     // Subtitle
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text('Professional Code Analysis Report', margin + 15, 32);
+    doc.text('Professional Code Analysis Report', margin + 25, 32);
     
     yPosition = 50;
   };
@@ -73,7 +92,7 @@ export function generateAnalysisReport(
     doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(color[0], color[1], color[2]);
-    doc.text(title, margin, yPosition + 5);
+    doc.text(safeText(title), margin, yPosition + 5);
     yPosition += 20;
   };
 
@@ -88,11 +107,11 @@ export function generateAnalysisReport(
     doc.setFontSize(10);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(75, 85, 99);
-    doc.text(label + ':', margin + 5, yPosition + 8);
+    doc.text(safeText(label) + ':', margin + 5, yPosition + 8);
     
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(color[0], color[1], color[2]);
-    doc.text(value, margin + 50, yPosition + 8);
+    doc.text(safeText(value), margin + 50, yPosition + 8);
     yPosition += 15;
   };
 
@@ -132,7 +151,7 @@ export function generateAnalysisReport(
     doc.setFontSize(14);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(31, 41, 55);
-    doc.text(title, margin + 50, yPosition + 12);
+    doc.text(safeText(title), margin + 50, yPosition + 12);
     
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
@@ -148,7 +167,7 @@ export function generateAnalysisReport(
 
   // Project Information Section
   addSectionHeader('Project Information', [59, 130, 246]);
-  addInfoBox('Project Name', projectName);
+  addInfoBox('Project Name', safeText(projectName));
   addInfoBox('Generated On', new Date().toLocaleDateString('en-US', { 
     year: 'numeric', 
     month: 'long', 
@@ -156,7 +175,7 @@ export function generateAnalysisReport(
     hour: '2-digit',
     minute: '2-digit'
   }));
-  addInfoBox('Generated For', userEmail);
+  addInfoBox('Generated For', safeText(userEmail));
   addInfoBox('Analysis Engine', 'Gemini 2.0 Flash AI');
   yPosition += 10;
 
@@ -170,7 +189,8 @@ export function generateAnalysisReport(
     checkPageBreak(30);
     
     doc.setFillColor(249, 250, 251);
-    const summaryLines = doc.splitTextToSize(analysis.summary, contentWidth - 20);
+    const cleanSummary = safeText(analysis.summary);
+    const summaryLines = doc.splitTextToSize(cleanSummary, contentWidth - 20);
     const summaryHeight = summaryLines.length * 6 + 10;
     
     doc.rect(margin, yPosition, contentWidth, summaryHeight, 'F');
@@ -184,7 +204,7 @@ export function generateAnalysisReport(
     
     summaryLines.forEach((line: string, index: number) => {
       checkPageBreak(8);
-      doc.text(line, margin + 10, yPosition + 10 + (index * 6));
+      doc.text(safeText(line), margin + 10, yPosition + 10 + (index * 6));
     });
     
     yPosition += summaryHeight + 15;
@@ -204,9 +224,11 @@ export function generateAnalysisReport(
       doc.setLineWidth(0.3);
       doc.rect(margin, yPosition, contentWidth, 25);
       
-      // File icon
-      doc.setFontSize(12);
-      doc.text('📄', margin + 5, yPosition + 12);
+      // File icon (simple rectangle)
+      doc.setFillColor(59, 130, 246);
+      doc.rect(margin + 5, yPosition + 8, 8, 10, 'F');
+      doc.setFillColor(255, 255, 255);
+      doc.rect(margin + 6, yPosition + 9, 6, 8, 'F');
       
       // File name
       doc.setFontSize(11);
@@ -215,7 +237,7 @@ export function generateAnalysisReport(
       const fileName = fileAnalysis.file_path.length > 50 ? 
         '...' + fileAnalysis.file_path.slice(-47) : 
         fileAnalysis.file_path;
-      doc.text(fileName, margin + 20, yPosition + 10);
+      doc.text(safeText(fileName), margin + 20, yPosition + 10);
       
       // File score
       const fileScoreColor = fileAnalysis.debt_score > 70 ? [239, 68, 68] :
@@ -238,25 +260,26 @@ export function generateAnalysisReport(
                                issue.severity === 'medium' ? [245, 158, 11] :
                                [156, 163, 175];
           
-          // Issue icon
-          const issueIcon = issue.severity === 'high' ? '🔴' :
-                           issue.severity === 'medium' ? '🟡' : '🔵';
-          
-          doc.setFontSize(10);
-          doc.text(issueIcon, margin + 10, yPosition + 5);
+          // Issue indicator (colored circle)
+          doc.setFillColor(severityColor[0], severityColor[1], severityColor[2]);
+          doc.circle(margin + 15, yPosition + 5, 3, 'F');
           
           // Issue type and severity
+          doc.setFontSize(10);
           doc.setFont('helvetica', 'bold');
           doc.setTextColor(severityColor[0], severityColor[1], severityColor[2]);
-          doc.text(`${issue.type} (${issue.severity})`, margin + 20, yPosition + 5);
+          const issueType = safeText(issue.type || 'Code Issue');
+          const severity = safeText(issue.severity || 'medium');
+          doc.text(`${issueType} (${severity})`, margin + 25, yPosition + 5);
           
           // Issue description
           doc.setFont('helvetica', 'normal');
           doc.setTextColor(75, 85, 99);
-          const descLines = doc.splitTextToSize(issue.description, contentWidth - 30);
+          const cleanDescription = safeText(issue.description || 'No description available');
+          const descLines = doc.splitTextToSize(cleanDescription, contentWidth - 35);
           descLines.slice(0, 2).forEach((line: string, lineIndex: number) => {
             checkPageBreak(6);
-            doc.text(line, margin + 20, yPosition + 12 + (lineIndex * 6));
+            doc.text(safeText(line), margin + 25, yPosition + 12 + (lineIndex * 6));
           });
           
           // Suggestion
@@ -265,10 +288,11 @@ export function generateAnalysisReport(
             checkPageBreak(8);
             doc.setFontSize(9);
             doc.setTextColor(59, 130, 246);
-            doc.text('💡 ', margin + 20, yPosition);
-            const suggestionLines = doc.splitTextToSize(issue.suggestion, contentWidth - 35);
+            doc.text('Suggestion: ', margin + 25, yPosition);
+            const cleanSuggestion = safeText(issue.suggestion);
+            const suggestionLines = doc.splitTextToSize(cleanSuggestion, contentWidth - 45);
             suggestionLines.slice(0, 1).forEach((line: string) => {
-              doc.text(line, margin + 30, yPosition);
+              doc.text(safeText(line), margin + 45, yPosition);
             });
           }
           
@@ -302,23 +326,24 @@ export function generateAnalysisReport(
       doc.setFillColor(priorityColor[0], priorityColor[1], priorityColor[2]);
       doc.rect(margin, yPosition, 5, 25, 'F');
       
-      // Priority icon
-      const priorityIcon = rec.priority === 'high' ? '⚠️' :
-                          rec.priority === 'medium' ? '⚡' : '✅';
-      
-      doc.setFontSize(12);
-      doc.text(priorityIcon, margin + 10, yPosition + 12);
+      // Priority indicator (triangle)
+      doc.setFillColor(priorityColor[0], priorityColor[1], priorityColor[2]);
+      const triangleX = margin + 15;
+      const triangleY = yPosition + 12;
+      doc.triangle(triangleX, triangleY - 3, triangleX - 3, triangleY + 3, triangleX + 3, triangleY + 3, 'F');
       
       // Category and priority
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(31, 41, 55);
-      doc.text(`${rec.category}`, margin + 25, yPosition + 10);
+      const category = safeText(rec.category || 'General');
+      doc.text(category, margin + 25, yPosition + 10);
       
       doc.setFontSize(9);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(priorityColor[0], priorityColor[1], priorityColor[2]);
-      doc.text(`${rec.priority.toUpperCase()} PRIORITY`, margin + 25, yPosition + 18);
+      const priority = safeText(rec.priority || 'medium').toUpperCase();
+      doc.text(`${priority} PRIORITY`, margin + 25, yPosition + 18);
       
       yPosition += 30;
       
@@ -326,10 +351,11 @@ export function generateAnalysisReport(
       doc.setFontSize(10);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(75, 85, 99);
-      const descLines = doc.splitTextToSize(rec.description, contentWidth - 20);
+      const cleanDescription = safeText(rec.description || 'No description available');
+      const descLines = doc.splitTextToSize(cleanDescription, contentWidth - 20);
       descLines.forEach((line: string, lineIndex: number) => {
         checkPageBreak(6);
-        doc.text(line, margin + 10, yPosition + (lineIndex * 6));
+        doc.text(safeText(line), margin + 10, yPosition + (lineIndex * 6));
       });
       yPosition += descLines.length * 6 + 5;
       
@@ -341,9 +367,10 @@ export function generateAnalysisReport(
         doc.setTextColor(107, 114, 128);
         doc.text('Impact: ', margin + 10, yPosition);
         doc.setFont('helvetica', 'normal');
-        const impactLines = doc.splitTextToSize(rec.impact, contentWidth - 35);
+        const cleanImpact = safeText(rec.impact);
+        const impactLines = doc.splitTextToSize(cleanImpact, contentWidth - 35);
         impactLines.slice(0, 1).forEach((line: string) => {
-          doc.text(line, margin + 30, yPosition);
+          doc.text(safeText(line), margin + 30, yPosition);
         });
         yPosition += 8;
       }
@@ -363,8 +390,9 @@ export function generateAnalysisReport(
     
     // Footer content
     doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
     doc.setTextColor(107, 114, 128);
-    doc.text(`Generated by TechDebt Analyzer | Professional Code Analysis Platform`, 
+    doc.text('Generated by TechDebt Analyzer | Professional Code Analysis Platform', 
              margin, pageHeight - 15);
     
     doc.setTextColor(156, 163, 175);

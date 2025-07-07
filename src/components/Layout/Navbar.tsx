@@ -65,14 +65,6 @@ export const Navbar: React.FC = () => {
                     className="relative h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
                   />
                 </div>
-                <div className="ml-3">
-                  <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
-                    TechDebt Analyzer
-                  </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
-                    Professional Code Analysis
-                  </p>
-                </div>
               </motion.div>
             </Link>
 
