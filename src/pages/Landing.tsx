@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Code2, Zap, Shield, BarChart3, FileText, Users, ArrowRight, CheckCircle, Sparkles, Brain, Target, TrendingUp, Play, ExternalLink } from 'lucide-react';
+import { Code2, Zap, Shield, BarChart3, FileText, Users, ArrowRight, CheckCircle, Sparkles, Brain, Target, TrendingUp, Play, ExternalLink, Star, Award, Rocket } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Navbar } from '../components/Layout/Navbar';
 import { BackgroundEffects } from '../components/UI/BackgroundEffects';
@@ -78,19 +78,19 @@ export const Landing: React.FC = () => {
   ];
 
   const stats = [
-    { label: 'Code Files Analyzed', value: '500+', icon: FileText },
-    { label: 'Issues Detected', value: '200+', icon: Target },
-    { label: 'Happy Developers', value: '50+', icon: Users },
-    { label: 'Languages Supported', value: '15+', icon: Code2 }
+    { label: 'Code Files Analyzed', value: '500+', icon: FileText, color: 'from-blue-500 to-cyan-500' },
+    { label: 'Issues Detected', value: '200+', icon: Target, color: 'from-purple-500 to-pink-500' },
+    { label: 'Happy Developers', value: '50+', icon: Users, color: 'from-green-500 to-emerald-500' },
+    { label: 'Languages Supported', value: '15+', icon: Code2, color: 'from-orange-500 to-red-500' }
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-blue-900 transition-colors duration-500 relative">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-blue-900 transition-colors duration-500 relative overflow-hidden">
       <BackgroundEffects />
       <Navbar />
       
       {/* Hero Section */}
-      <section className="relative pt-24 sm:pt-32 pb-16 sm:pb-20 overflow-hidden">
+      <section className="relative pt-28 sm:pt-36 pb-20 sm:pb-24 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -103,12 +103,20 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="inline-flex items-center space-x-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-sm border border-blue-200/20 dark:border-blue-800/20 rounded-full mb-6 sm:mb-8"
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-indigo-600/10 backdrop-blur-sm border border-blue-200/30 dark:border-blue-800/30 rounded-full mb-8"
             >
-              <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+              <div className="relative">
+                <Sparkles className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <motion.div
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute inset-0 bg-blue-400 rounded-full opacity-20 blur-sm"
+                />
+              </div>
+              <span className="text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
                 Powered by Walmart Innovation
               </span>
+              <Award className="h-4 w-4 text-purple-600 dark:text-purple-400" />
             </motion.div>
 
             {/* Main Heading */}
@@ -116,13 +124,13 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.8 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight px-4"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight px-4"
             >
               <span className="bg-gradient-to-r from-gray-900 via-blue-900 to-purple-900 dark:from-white dark:via-blue-100 dark:to-purple-100 bg-clip-text text-transparent">
                 Professional
               </span>
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-gradient">
                 Tech Debt Analysis
               </span>
             </motion.h1>
@@ -131,7 +139,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4, duration: 0.8 }}
-              className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 sm:mb-12 max-w-4xl mx-auto leading-relaxed px-4"
+              className="text-lg sm:text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-12 max-w-4xl mx-auto leading-relaxed px-4 font-medium"
             >
               Identify technical debt, code smells, and architectural issues in your codebase. 
               Get actionable insights powered by advanced AI analysis and comprehensive reports.
@@ -142,15 +150,25 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 justify-center mb-12 sm:mb-16 px-4"
+              className="flex flex-col sm:flex-row gap-4 justify-center mb-16 px-4"
             >
               <Link to="/dashboard" className="w-full sm:w-auto">
-                <AnimatedButton size="lg" icon={ArrowRight} className="w-full sm:w-auto">
+                <AnimatedButton 
+                  size="xl" 
+                  icon={Rocket} 
+                  className="w-full sm:w-auto text-lg font-bold shadow-2xl"
+                  glow
+                >
                   Start Free Analysis
                 </AnimatedButton>
               </Link>
               
-              <AnimatedButton variant="secondary" size="lg" icon={Play} className="w-full sm:w-auto">
+              <AnimatedButton 
+                variant="secondary" 
+                size="xl" 
+                icon={Play} 
+                className="w-full sm:w-auto text-lg font-bold"
+              >
                 Watch Demo
               </AnimatedButton>
             </motion.div>
@@ -160,7 +178,7 @@ export const Landing: React.FC = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8 max-w-4xl mx-auto px-4"
+              className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto px-4"
             >
               {stats.map((stat, index) => (
                 <motion.div
@@ -168,17 +186,18 @@ export const Landing: React.FC = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.7 + index * 0.1, duration: 0.5 }}
-                  className="text-center"
                 >
-                  <div className="flex justify-center mb-2">
-                    <stat.icon className="h-6 sm:h-8 w-6 sm:w-8 text-blue-600 dark:text-blue-400" />
-                  </div>
-                  <div className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">
-                    {stat.label}
-                  </div>
+                  <GlassCard className="p-6 text-center hover:scale-105 transition-transform duration-300" glow>
+                    <div className={`bg-gradient-to-r ${stat.color} p-3 rounded-2xl inline-block mb-4 shadow-lg`}>
+                      <stat.icon className="h-6 w-6 text-white" />
+                    </div>
+                    <div className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-2">
+                      {stat.value}
+                    </div>
+                    <div className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                      {stat.label}
+                    </div>
+                  </GlassCard>
                 </motion.div>
               ))}
             </motion.div>
@@ -187,25 +206,33 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-16 sm:py-20 relative">
+      <section className="py-20 sm:py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16"
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-4">
-              Comprehensive Code Analysis
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-600/10 to-pink-600/10 backdrop-blur-sm border border-purple-200/30 dark:border-purple-800/30 rounded-full mb-6">
+              <Star className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                Comprehensive Analysis
+              </span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 px-4">
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Powerful Features
+              </span>
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4 font-medium">
               Our AI-powered platform analyzes your codebase thoroughly to identify technical debt, 
               performance issues, and architectural problems.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <motion.div
                 key={index}
@@ -214,14 +241,14 @@ export const Landing: React.FC = () => {
                 viewport={{ once: true }}
                 transition={{ delay: feature.delay, duration: 0.6 }}
               >
-                <GlassCard className="p-6 sm:p-8 h-full">
-                  <div className={`bg-gradient-to-r ${feature.color} p-3 sm:p-4 rounded-2xl inline-block mb-4 sm:mb-6`}>
-                    <feature.icon className="h-6 sm:h-8 w-6 sm:w-8 text-white" />
+                <GlassCard className="p-8 h-full group" hover interactive>
+                  <div className={`bg-gradient-to-r ${feature.color} p-4 rounded-3xl inline-block mb-6 shadow-xl group-hover:scale-110 transition-transform duration-300`}>
+                    <feature.icon className="h-8 w-8 text-white" />
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
                     {feature.description}
                   </p>
                 </GlassCard>
@@ -232,24 +259,32 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-16 sm:py-20 relative">
+      <section className="py-20 sm:py-24 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-12 sm:mb-16"
+            className="text-center mb-16"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-4">
-              How It Works
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-green-600/10 to-emerald-600/10 backdrop-blur-sm border border-green-200/30 dark:border-green-800/30 rounded-full mb-6">
+              <Zap className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <span className="text-sm font-semibold text-green-600 dark:text-green-400">
+                Simple Process
+              </span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 px-4">
+              <span className="bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                How It Works
+              </span>
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4">
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto px-4 font-medium">
               Get professional code analysis in three simple steps
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {steps.map((step, index) => (
               <motion.div
                 key={index}
@@ -261,22 +296,25 @@ export const Landing: React.FC = () => {
               >
                 {/* Connection line */}
                 {index < steps.length - 1 && (
-                  <div className="hidden md:block absolute top-16 left-full w-full h-0.5 bg-gradient-to-r from-blue-600/50 to-purple-600/50 transform -translate-x-1/2 z-0" />
+                  <div className="hidden md:block absolute top-20 left-full w-full h-1 bg-gradient-to-r from-blue-600/30 to-purple-600/30 transform -translate-x-1/2 z-0 rounded-full" />
                 )}
                 
-                <GlassCard className="p-6 sm:p-8 relative z-10">
-                  <div className="relative mb-4 sm:mb-6">
-                    <div className={`bg-gradient-to-r ${step.color} text-white text-lg sm:text-xl font-bold w-12 h-12 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
+                <GlassCard className="p-8 relative z-10 group" hover>
+                  <div className="relative mb-6">
+                    <motion.div 
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      className={`bg-gradient-to-r ${step.color} text-white text-2xl font-black w-16 h-16 rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-2xl group-hover:shadow-glow transition-all duration-300`}
+                    >
                       {step.step}
-                    </div>
-                    <div className="bg-white/50 dark:bg-gray-800/50 p-2 sm:p-3 rounded-xl inline-block">
-                      <step.icon className="h-6 sm:h-8 w-6 sm:w-8 text-blue-600 dark:text-blue-400" />
+                    </motion.div>
+                    <div className="bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm p-3 rounded-2xl inline-block shadow-lg">
+                      <step.icon className="h-8 w-8 text-blue-600 dark:text-blue-400" />
                     </div>
                   </div>
-                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-sm sm:text-base">
+                  <p className="text-gray-600 dark:text-gray-300 leading-relaxed font-medium">
                     {step.description}
                   </p>
                 </GlassCard>
@@ -287,8 +325,8 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 sm:py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-purple-600/10 backdrop-blur-3xl" />
+      <section className="py-20 sm:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-purple-600/10 to-pink-600/10 backdrop-blur-3xl" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -297,33 +335,46 @@ export const Landing: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 sm:mb-6 px-4">
-              Ready to Improve Your Code Quality?
+            <div className="inline-flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border border-blue-200/40 dark:border-blue-800/40 rounded-full mb-8">
+              <Rocket className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                Ready to Start?
+              </span>
+            </div>
+            <h2 className="text-4xl sm:text-5xl md:text-6xl font-black text-gray-900 dark:text-white mb-6 px-4">
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                Improve Your Code Quality
+              </span>
             </h2>
-            <p className="text-lg sm:text-xl text-gray-600 dark:text-gray-300 mb-8 sm:mb-12 max-w-3xl mx-auto px-4">
+            <p className="text-xl text-gray-600 dark:text-gray-300 mb-12 max-w-3xl mx-auto px-4 font-medium">
               Join thousands of developers who trust our platform to identify and fix technical debt. 
               Start your free analysis today.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-8 sm:mb-12 px-4">
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12 px-4">
               <Link to="/dashboard" className="w-full sm:w-auto">
-                <AnimatedButton size="lg" icon={ArrowRight} className="w-full sm:w-auto">
+                <AnimatedButton 
+                  size="xl" 
+                  icon={ArrowRight} 
+                  className="w-full sm:w-auto text-lg font-bold shadow-2xl"
+                  glow
+                >
                   Start Free Analysis
                 </AnimatedButton>
               </Link>
               
-              <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-gray-600 dark:text-gray-400">
+              <div className="flex flex-wrap items-center justify-center gap-6 text-gray-600 dark:text-gray-400">
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="text-sm sm:text-base">Free to start</span>
+                  <span className="font-medium">Free to start</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="text-sm sm:text-base">Secure & private</span>
+                  <span className="font-medium">Secure & private</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <CheckCircle className="h-5 w-5 text-green-500" />
-                  <span className="text-sm sm:text-base">No credit card</span>
+                  <span className="font-medium">No credit card</span>
                 </div>
               </div>
             </div>
@@ -332,49 +383,51 @@ export const Landing: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="relative py-12 sm:py-16 border-t border-gray-200/20 dark:border-gray-700/20 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl">
+      <footer className="relative py-16 border-t border-gray-200/30 dark:border-gray-700/30 bg-white/60 dark:bg-gray-900/60 backdrop-blur-2xl">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="flex flex-col lg:flex-row justify-between items-center gap-6 lg:gap-8"
+            className="flex flex-col lg:flex-row justify-between items-center gap-8"
           >
             {/* Developer Credits */}
             <div className="text-center lg:text-left">
-              <p className="text-gray-600 dark:text-gray-400 mb-2">
+              <p className="text-gray-600 dark:text-gray-400 mb-3 font-medium">
                 Developed for{' '}
-                <span className="font-semibold text-blue-600 dark:text-blue-400">Sparkathon by Walmart</span>
+                <span className="font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  Sparkathon by Walmart
+                </span>
               </p>
-              <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm">
-                <span className="text-gray-500 dark:text-gray-500">by</span>
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-sm">
+                <span className="text-gray-500 dark:text-gray-500 font-medium">by</span>
                 <div className="flex items-center gap-4">
                   <motion.a
                     href="https://www.linkedin.com/in/yaswanthd/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-blue-600/10 to-purple-600/10 hover:from-blue-600/20 hover:to-purple-600/20 backdrop-blur-sm border border-blue-200/20 dark:border-blue-800/20 rounded-lg transition-all duration-300 group"
+                    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 hover:from-blue-600/20 hover:to-purple-600/20 backdrop-blur-sm border border-blue-200/30 dark:border-blue-800/30 rounded-xl transition-all duration-300 group shadow-md hover:shadow-lg"
                   >
-                    <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       D. Yaswanth
                     </span>
                     <ExternalLink className="h-3 w-3 text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
                   </motion.a>
                   
-                  <span className="text-gray-400 dark:text-gray-600">&</span>
+                  <span className="text-gray-400 dark:text-gray-600 font-bold">&</span>
                   
                   <motion.a
                     href="https://www.linkedin.com/in/sai-seshu/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className="flex items-center space-x-2 px-3 py-1.5 bg-gradient-to-r from-blue-600/10 to-purple-600/10 hover:from-blue-600/20 hover:to-purple-600/20 backdrop-blur-sm border border-blue-200/20 dark:border-blue-800/20 rounded-lg transition-all duration-300 group"
+                    className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-600/10 to-purple-600/10 hover:from-blue-600/20 hover:to-purple-600/20 backdrop-blur-sm border border-blue-200/30 dark:border-blue-800/30 rounded-xl transition-all duration-300 group shadow-md hover:shadow-lg"
                   >
-                    <span className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <span className="font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                       S. Seshu
                     </span>
                     <ExternalLink className="h-3 w-3 text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
@@ -388,25 +441,25 @@ export const Landing: React.FC = () => {
               href="https://www.walmart.com"
               target="_blank"
               rel="noopener noreferrer"
-              whileHover={{ scale: 1.05, y: -2 }}
+              whileHover={{ scale: 1.05, y: -3 }}
               whileTap={{ scale: 0.95 }}
-              className="flex items-center space-x-3 px-4 py-3 bg-gradient-to-r from-gray-900/5 to-gray-800/5 dark:from-white/5 dark:to-gray-100/5 hover:from-gray-900/10 hover:to-gray-800/10 dark:hover:from-white/10 dark:hover:to-gray-100/10 backdrop-blur-sm border border-gray-200/30 dark:border-gray-700/30 rounded-xl transition-all duration-300 group"
+              className="flex items-center space-x-4 px-6 py-4 bg-gradient-to-r from-gray-900/5 to-gray-800/5 dark:from-white/5 dark:to-gray-100/5 hover:from-gray-900/10 hover:to-gray-800/10 dark:hover:from-white/10 dark:hover:to-gray-100/10 backdrop-blur-sm border border-gray-200/40 dark:border-gray-700/40 rounded-2xl transition-all duration-300 group shadow-lg hover:shadow-xl"
             >
               <div className="relative">
-                <div className="h-8 w-8 bg-gradient-to-r from-blue-600 to-yellow-500 rounded-lg flex items-center justify-center">
-                  <Sparkles className="h-5 w-5 text-white" />
+                <div className="h-10 w-10 bg-gradient-to-r from-blue-600 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-yellow-500/20 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600/30 to-yellow-500/30 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-lg" />
               </div>
               <div className="text-left">
-                <div className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <div className="text-base font-bold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                   Powered by Walmart
                 </div>
-                <div className="text-xs text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors">
+                <div className="text-sm text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors font-medium">
                   Sparkathon Innovation
                 </div>
               </div>
-              <ExternalLink className="h-4 w-4 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
+              <ExternalLink className="h-5 w-5 text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors" />
             </motion.a>
           </motion.div>
 
@@ -416,9 +469,9 @@ export const Landing: React.FC = () => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2, duration: 0.6 }}
-            className="mt-8 pt-6 border-t border-gray-200/20 dark:border-gray-700/20 text-center"
+            className="mt-12 pt-8 border-t border-gray-200/30 dark:border-gray-700/30 text-center"
           >
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-gray-500 dark:text-gray-400 font-medium">
               © {new Date().getFullYear()} TechDebt Analyzer. Built for developers, by developers.
             </p>
           </motion.div>
