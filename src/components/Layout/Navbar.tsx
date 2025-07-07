@@ -50,7 +50,7 @@ export const Navbar: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
-            {/* Logo */}
+            {/* Logo - Increased size */}
             <Link to="/" className="flex items-center group">
               <motion.div
                 whileHover={{ scale: 1.05, rotate: 2 }}
@@ -61,8 +61,8 @@ export const Navbar: React.FC = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition-opacity duration-300"></div>
                   <img
                     src={theme === 'light' ? 'https://raw.githubusercontent.com/yaswanth-yashu/Lint/master/src/assets/lint_light%20thlogo.png' : 'https://raw.githubusercontent.com/yaswanth-yashu/Lint/master/src/assets/lint_black_thlogo.png'}
-                    alt="TechDebt Analyzer"
-                    className="relative h-12 w-auto object-contain transition-all duration-300 group-hover:scale-105"
+                    alt="Lint - TechDebt Analyzer"
+                    className="relative h-16 w-auto object-contain transition-all duration-300 group-hover:scale-105"
                   />
                 </div>
               </motion.div>
