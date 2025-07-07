@@ -53,17 +53,20 @@ export const Navbar: React.FC = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center group">
               <motion.div
-                whileHover={{ scale: 1.05, rotate: 5 }}
+                whileHover={{ scale: 1.05, rotate: 2 }}
                 whileTap={{ scale: 0.95 }}
                 className="relative flex items-center"
               >
+                {/* Theme-based logo */}
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-                  <div className="relative bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-3 rounded-2xl shadow-lg">
-                    <Code2 className="h-8 w-8 text-white" />
-                  </div>
+                  <img
+                    src={theme === 'light' ? 'https://raw.githubusercontent.com/yaswanth-yashu/Lint/master/src/assets/lint_light%20thlogo.png' : 'https://raw.githubusercontent.com/yaswanth-yashu/Lint/master/src/assets/lint_black_thlogo.png'}
+                    alt="TechDebt Analyzer"
+                    className="relative h-12 w-auto object-contain rounded-xl shadow-lg group-hover:shadow-xl transition-shadow duration-300"
+                  />
                 </div>
-                <div className="ml-3">
+                <div className="ml-4">
                   <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
                     TechDebt Analyzer
                   </h1>
